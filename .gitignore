@@ -1,0 +1,6 @@
+# arquivos JSON com informações sensiveis (api key) e arquivos de teste da busca
+config.json
+opilliaceae.json
+resultados.json
+
+__pycache__/
