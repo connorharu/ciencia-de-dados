@@ -2,5 +2,7 @@
 config.json
 opilliaceae.json
 resultados.json
+filtragens.txt
 
 __pycache__/
+venv/

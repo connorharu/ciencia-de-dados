@@ -1,4 +1,4 @@
-USE ciencia_de_dados;
+USE NOME DO SEU SCHEMA AQUI;
 
 DROP TABLE IF EXISTS registros_biodiversidade;
 

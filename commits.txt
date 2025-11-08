@@ -1,0 +1,2 @@
+Commits importantes:
+d154716 - adição dos métodos de busca de registros na API do speciesLink e inserção em um banco de dados Mysql;
