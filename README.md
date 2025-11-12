@@ -16,3 +16,7 @@ IMPORTANTE: para rodar o código você precisa ter uma api key, que você pode o
   - realizar as filtragens encontradas em filtragem.ipynb
 
 - Em etapa_3:
+  - 3.2.1 Organização dos Dados
+  - 3.2.2 Reestruturação Necessária
+  - 3.3 Consultas SQL Analíticas
+  - 3.4 Análise Exploratória e Teste de Hipóteses
