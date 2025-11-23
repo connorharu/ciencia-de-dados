@@ -1,12 +1,13 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, f1_score
 from sklearn.impute import SimpleImputer
 import warnings
 warnings.filterwarnings("ignore")
 import numpy as np
+import random
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 df = pd.read_parquet("registros_biodiversidade_ARRUMADO.parquet")
@@ -30,7 +31,7 @@ imputer = SimpleImputer(strategy="most_frequent")
 X_imputed = imputer.fit_transform(X)
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X_imputed, y, test_size=0.25, random_state=42, stratify=y
+    X_imputed, y, test_size=0.25, random_state=random.randint(0, 10000), stratify=y
 )
 
 
@@ -42,23 +43,88 @@ model_log.fit(X_train, y_train)
 y_pred_log = model_log.predict(X_test)
 
 print("Resultados da regressão logística:")
-print("Acurácia:", accuracy_score(y_test, y_pred_log))
+print("f1_score:", f1_score(y_test, y_pred_log))
 print(classification_report(y_test, y_pred_log))
+
+# grid search p/ regressão logistica
+param_grid_log = {
+    "C": [0.01, 0.1, 1, 10],
+    "solver": ["lbfgs"],
+    "penalty": ["l2"]
+}
+
+log_tuned = GridSearchCV(
+    LogisticRegression(max_iter=500),
+    param_grid_log,
+    cv=5,
+    scoring="f1_macro",
+    n_jobs=-1
+)
+
+log_tuned.fit(X_train, y_train)
+
+print("\nparametros para regressao logistica")
+print(log_tuned.best_params_)
+
+y_pred_log_tuned = log_tuned.predict(X_test)
+f1_log_tuned = f1_score(y_test, y_pred_log_tuned, average="macro")
+
+print(f"novo f1: {f1_log_tuned:.4f}")
+print(classification_report(y_test, y_pred_log_tuned))
+
+print("\comparação F1")
+print(f"F1 original: {f1_score(y_test, y_pred_log, average='macro'):.4f}")
+print(f"F1 após gridsearch: {f1_log_tuned:.4f}")
 
 # 4.2.1 random forest pra pergunta 1
 
 model_rf = RandomForestClassifier(
     n_estimators=300,
     max_depth=None,
-    random_state=42
+    random_state=random.randint(0, 10000)
 )
 model_rf.fit(X_train, y_train)
 
 y_pred_rf = model_rf.predict(X_test)
 
 print("Resultados do random forest:")
-print("Acurácia:", accuracy_score(y_test, y_pred_rf))
+print("f1_score:", f1_score(y_test, y_pred_rf))
 print(classification_report(y_test, y_pred_rf))
+
+param_grid_rf = {
+    "n_estimators": [50, 100],         # leve
+    "max_depth": [None, 10],           # leve
+    "min_samples_split": [2, 5],       # leve
+    "min_samples_leaf": [1, 2]         # leve
+}
+
+rf = RandomForestClassifier(random_state=random.randint(0, 10000))
+
+rf_grid = GridSearchCV(
+    estimator=rf,
+    param_grid=param_grid_rf,
+    cv=5, 
+    scoring="f1_macro",
+    n_jobs=1,
+    verbose=1
+)
+
+rf_grid.fit(X_train, y_train)
+
+print("\nmelhores parâmetros encontrados")
+print(rf_grid.best_params_)
+
+# Prever com o melhor modelo
+y_pred_tuned = rf_grid.best_estimator_.predict(X_test)
+
+f1_tuned = f1_score(y_test, y_pred_tuned, average="macro")
+
+print(f"\nF1-score com gridsearch: {f1_tuned:.4f}")
+print(classification_report(y_test, y_pred_tuned))
+
+print("\ncomparação F1")
+print(f"F1 original: {f1_score(y_test, y_pred_rf, average='macro'):.4f}")
+print(f"F1 após gridsearch: {f1_tuned:.4f}")
 
 # Importância das variáveis
 importances = pd.Series(model_rf.feature_importances_, 
@@ -133,11 +199,11 @@ scaler = StandardScaler()
 X[num_cols] = scaler.fit_transform(X[num_cols])
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+    X, y, test_size=0.2, random_state=random.randint(0, 10000)
 )
 
 # 4.2.2 random forest com feature engineering pra pergunta 1
-rf = RandomForestClassifier(n_estimators=200, random_state=42)
+rf = RandomForestClassifier(n_estimators=200, random_state=random.randint(0, 10000))
 rf.fit(X_train, y_train)
 
 y_pred = rf.predict(X_test)
@@ -145,7 +211,7 @@ y_pred = rf.predict(X_test)
 print("\n==============================")
 print("Random forest com feature engineering")
 print("==============================")
-print("Acurácia:", accuracy_score(y_test, y_pred))
+print("f1_score", f1_score(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 # Importância das variáveis
@@ -166,5 +232,5 @@ log_reg.fit(X_train, y_train)
 y_pred_lr = log_reg.predict(X_test)
 
 print("Regressão logística com feature engineering")
-print("Acurácia:", accuracy_score(y_test, y_pred_lr))
+print("f1_score:", f1_score(y_test, y_pred_lr))
 print(classification_report(y_test, y_pred_lr))

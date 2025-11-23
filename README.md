@@ -20,3 +20,6 @@ IMPORTANTE: para rodar o código você precisa ter uma api key, que você pode o
   - 3.2.2 Reestruturação Necessária
   - 3.3 Consultas SQL Analíticas
   - 3.4 Análise Exploratória e Teste de Hipóteses
+
+- Em etapa_4:
+  - teste.py tem o 4.2 da primeira pergunta e forest.ipynb tem o 4.2 da segunda pergunta;
