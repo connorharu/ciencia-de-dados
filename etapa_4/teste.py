@@ -43,7 +43,7 @@ model_log.fit(X_train, y_train)
 y_pred_log = model_log.predict(X_test)
 
 print("Resultados da regressão logística:")
-print("f1_score:", f1_score(y_test, y_pred_log))
+print("f1_score:", f1_score(y_test, y_pred_log, average="macro"))
 print(classification_report(y_test, y_pred_log))
 
 # grid search p/ regressão logistica
@@ -88,7 +88,7 @@ model_rf.fit(X_train, y_train)
 y_pred_rf = model_rf.predict(X_test)
 
 print("Resultados do random forest:")
-print("f1_score:", f1_score(y_test, y_pred_rf))
+print("f1_score:", f1_score(y_test, y_pred_rf, average="macro"))
 print(classification_report(y_test, y_pred_rf))
 
 param_grid_rf = {
@@ -208,10 +208,8 @@ rf.fit(X_train, y_train)
 
 y_pred = rf.predict(X_test)
 
-print("\n==============================")
 print("Random forest com feature engineering")
-print("==============================")
-print("f1_score", f1_score(y_test, y_pred))
+print("f1_score:", f1_score(y_test, y_pred, average="macro"))
 print(classification_report(y_test, y_pred))
 
 # Importância das variáveis
@@ -232,5 +230,5 @@ log_reg.fit(X_train, y_train)
 y_pred_lr = log_reg.predict(X_test)
 
 print("Regressão logística com feature engineering")
-print("f1_score:", f1_score(y_test, y_pred_lr))
+print("f1_score:", f1_score(y_test, y_pred_lr, average="macro"))
 print(classification_report(y_test, y_pred_lr))
